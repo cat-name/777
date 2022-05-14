@@ -1,0 +1,577 @@
+package notepad;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.*;
+import java.io.*;
+
+    public class Notepad implements ActionListener {
+
+        /**
+         * Оконная операция
+         */
+
+        // Объявляем компонент
+        приватный JFrame jframe = новый JFrame (); // интерфейс jframe
+        частный JMenuBar menuBar; // строка меню
+        закрытый файл JMenu, edit, type, more; // первые 1,2,3,4 кнопки на панели
+        закрытый JMenuItem newFile, openFile, savaFile, newSave, exit; // опции в файле
+        приватный JMenuItem о, help; // опции на более
+        private JTextArea txt; // текстовое поле
+        private JScrollPane jsp; // Прокручиваем полосу перемещения текстового поля
+        private JCheckBox jradioButton; // опция переноса слова в типе
+        private JMenu font; // Элемент шрифта в типе
+        private JMenu fontsize, fontcolor; // Размер шрифта, цвет
+        приватный JRadioButton fontsize1, fontsize2, fontsize3; // размер шрифта
+        приватный JRadioButton fontcolor1, fontcolor2, fontcolor3; // цвет
+        приватная ButtonGroup bg1, bg2; // радиогруппа
+        частное копирование JMenuItem, вырезание, вставка, del; // копирование, вырезание, вставка, удаление (внутри блока редактирования)
+        частный JMenuItem copy1, cut1, Paste1, del1; // копировать, вырезать, вставить, удалить (во всплывающем меню)
+        private JPopupMenu jpopu; // Панель всплывающего меню
+
+        /**
+         * Создание различных компонентов
+         */
+        public Notepad() {
+
+            menuBar = new JMenuBar();// menuBar
+            menuBar.setBackground(new Color(230, 230, 250));
+
+            jpopu = new JPopupMenu();// jpopu
+            jpopu.setPopupSize(60, 80);
+            jpopu.setVisible(false);
+
+            file = new JMenu ("FILE (F)"); // Создание кнопки файла
+            file.setFont(new Font("Monospaced", Font.PLAIN, 13));
+            file.setBackground(new Color(230, 230, 250));
+            file.addActionListener(this);
+            file.setMnemonic(java.awt.event.KeyEvent.VK_F);
+
+            edit = new JMenu ("Edit (E)"); // создание блока редактирования
+            edit.setFont(new Font("Monospaced", Font.PLAIN, 13));
+            edit.setBackground(new Color(230, 230, 250));
+            edit.addActionListener(this);
+            edit.setMnemonic(java.awt.event.KeyEvent.VK_E);
+
+            type = new JMenu ("format (T)"); // создаем экземпляр блока типа
+            type.setFont(new Font("Monospaced", Font.PLAIN, 13));
+            type.setBackground(new Color(230, 230, 250));
+            type.addActionListener(this);
+            type.setMnemonic(java.awt.event.KeyEvent.VK_T);
+
+            more = new JMenu ("More (M)"); // Создание блока more
+            more.setFont(new Font("Monospaced", Font.PLAIN, 13));
+            more.setBackground(new Color(230, 230, 250));
+            more.addActionListener(this);
+            more.setMnemonic(java.awt.event.KeyEvent.VK_M);
+
+            newFile = new JMenuItem ("New (N)"); // Блок файла
+            newFile.setBackground(new Color(230, 230, 250));
+            newFile.addActionListener(this);
+            newFile.setMnemonic(java.awt.event.KeyEvent.VK_N);
+
+            openFile = new JMenuItem ("Open (O)"); // Блок файла
+            openFile.setBackground(new Color(230, 230, 250));
+            openFile.addActionListener(this);
+            openFile.setMnemonic(java.awt.event.KeyEvent.VK_O);
+
+            savaFile = new JMenuItem ("Save (S)"); // Блок файла
+            savaFile.setBackground(new Color(230, 230, 250));
+            savaFile.addActionListener(this);
+            savaFile.setMnemonic(java.awt.event.KeyEvent.VK_S);
+
+            newSave = new JMenuItem ("Сохранить как"); // Блок файла
+            newSave.setBackground(new Color(230, 230, 250));
+            newSave.addActionListener(this);
+
+            exit = new JMenuItem ("Exit (X)"); // Блок файла
+            exit.setBackground(new Color(230, 230, 250));
+            exit.addActionListener(this);
+            exit.setMnemonic(java.awt.event.KeyEvent.VK_X);
+
+            copy = new JMenuItem ("Copy (C)"); // Редактировать блок
+            copy.setBackground(new Color(230, 230, 250));
+            copy.addActionListener(this);
+            copy.setMnemonic(java.awt.event.KeyEvent.VK_C);
+
+            cut = new JMenuItem ("cut (X)"); // редактировать блок
+            cut.setBackground(new Color(230, 230, 250));
+            cut.addActionListener(this);
+            cut.setMnemonic(java.awt.event.KeyEvent.VK_X);
+
+            Paste = new JMenuItem ("Paste (V)"); // блок редактирования
+            Paste.setBackground(new Color(230, 230, 250));
+            Paste.addActionListener(this);
+            Paste.setMnemonic(java.awt.event.KeyEvent.VK_V);
+
+            del = new JMenuItem ("Delete (D)"); // редактировать блок
+            del.setBackground(new Color(230, 230, 250));
+            del.addActionListener(this);
+            del.setMnemonic(java.awt.event.KeyEvent.VK_D);
+
+            copy1 = new JMenuItem ("Copy (C)"); // Блок jpopu
+            copy1.setBackground(new Color(230, 230, 250));
+            copy1.addActionListener(this);
+            copy1.setMnemonic(java.awt.event.KeyEvent.VK_C);
+
+            cut1 = новый JMenuItem ("cut (X)"); // блок Jpopu
+            cut1.setBackground(new Color(230, 230, 250));
+            cut1.addActionListener(this);
+            cut1.setMnemonic(java.awt.event.KeyEvent.VK_X);
+
+            Paste1 = new JMenuItem ("Paste (V)"); // Блок jpopu
+            Paste1.setBackground(new Color(230, 230, 250));
+            Paste1.addActionListener(this);
+            Paste1.setMnemonic(java.awt.event.KeyEvent.VK_V);
+
+            del1 = new JMenuItem ("Delete (D)"); // Блок jpopu
+            del1.setBackground(new Color(230, 230, 250));
+            del1.addActionListener(this);
+            del1.setMnemonic(java.awt.event.KeyEvent.VK_D);
+
+            jradioButton = new JCheckBox ("Wrap"); // в блоке типа
+            jradioButton.addActionListener(this);
+            jradioButton.setSelected(true);
+
+            about = new JMenuItem ("About (A)"); // Подробнее о
+            about.setBackground(new Color(230, 230, 250));
+            about.addActionListener(this);
+
+            help = new JMenuItem ("Help (H)"); // Подробнее о
+            help.setBackground(new Color(230, 230, 250));
+            help.addActionListener(this);
+
+            /*
+             * Добавить контент, который нужно добавить в блок jpopu
+             *
+             */
+            jpopu.add(copy1);
+            jpopu.addSeparator (); // Разделительная линия
+            jpopu.add(cut1);
+            jpopu.addSeparator (); // Разделительная линия
+            jpopu.add(Paste1);
+            jpopu.addSeparator (); // Разделительная линия
+            jpopu.add(del1);
+
+            /*
+             * Создание текстовых полей
+             */
+            txt = new JTextArea (); // Здесь не указан размер, 23, 109 --- потому что он добавляется непосредственно в jframe
+            txt.setBackground(Color.white);
+            txt.setFont(new Font("Monospaced", Font.PLAIN, 19));
+            txt.setForeground(Color.black);
+            txt.setLineWrap(true);
+            /*
+             * Мониторинг событий мыши на поле в текстовом поле txt >>>>>> Генерируется событие правого клика, и отображается содержимое в блоке jopopu всплывающего меню.
+             *
+             */
+            txt.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
+                        jpopu.show(txt, e.getX(), e.getY());
+
+                    }
+                }
+            });
+
+            /*
+             * Отслеживать события клавиатуры для блоков в текстовом поле txt >>>>>> Генерировать события клавиатуры, и происходит соответствующий метод обработки текста.
+             *
+             *
+             */
+            txt.addKeyListener(new KeyAdapter() {
+                public void keyPressed(KeyEvent e) {
+                    if ((e.getKeyCode() == KeyEvent.VK_S) && (e.isControlDown())) {// ctrl+s
+                        sava();
+                    } // дублируем значение ключа windows
+                    if ((e.getKeyCode() == KeyEvent.VK_O) && (e.isControlDown())) {// ctrl+o
+                        openFile();
+                    }
+                    // if ((e.getKeyCode() == KeyEvent.VK_N) && (e.isControlDown()))
+                    // {// ctrl+n
+                    // newFile();
+                    // }
+                    // if ((e.getKeyCode() == KeyEvent.VK_C) && (e.isControlDown()))
+                    // {// ctrl+c
+                    // copy();
+                    // }
+                    // if ((e.getKeyCode() == KeyEvent.VK_X) && (e.isControlDown()))
+                    // {// ctrl+x
+                    // cut();
+                    //} // Если используется здесь, он будет передан копии Windows, да, скопируйте содержимое дважды
+                    // if ((e.getKeyCode() == KeyEvent.VK_V) &&
+                    // (e.isControlDown()))
+                    // {// ctrl+v
+                    // Paste();
+                    // }
+                    if ((e.getKeyCode() == KeyEvent.VK_D) && (e.isControlDown())) {// ctrl+d
+                        del();
+                    }
+                }
+            });
+
+            font = new JMenu ("Параметры шрифта");
+            font.setBackground(new Color(230, 230, 250));
+
+            fontsize = new JMenu ("размер шрифта");
+            fontsize.setBackground(new Color(230, 230, 250));
+
+            fontcolor = new JMenu ("цвет шрифта");
+            fontcolor.setBackground(new Color(230, 230, 250));
+
+            bg1 = new ButtonGroup();
+            bg2 = new ButtonGroup();
+
+            fontsize1 = новый JRadioButton ("Труба");
+            fontsize1.setBackground(new Color(230, 230, 250));
+            fontsize1.addActionListener(this);
+
+            fontsize2 = новый JRadioButton ("Средний");
+            fontsize2.setBackground(new Color(230, 230, 250));
+            fontsize2.addActionListener(this);
+
+            fontsize3 = новый JRadioButton ("Large");
+            fontsize3.setBackground(new Color(230, 230, 250));
+            fontsize3.addActionListener(this);
+
+            bg1.add(fontsize1);
+            bg1.add(fontsize2);
+            bg1.add(fontsize3);
+
+            fontsize.add(fontsize1);
+            fontsize.add(fontsize2);
+            fontsize.add(fontsize3);
+
+            fontcolor1 = new JRadioButton ("красный");
+            fontcolor1.setBackground(new Color(230, 230, 250));
+            fontcolor1.addActionListener(this);
+
+            fontcolor2 = new JRadioButton ("зеленый");
+            fontcolor2.setBackground(new Color(230, 230, 250));
+            fontcolor2.addActionListener(this);
+
+            fontcolor3 = new JRadioButton ("синий");
+            fontcolor3.setBackground(new Color(230, 230, 250));
+            fontcolor3.addActionListener(this);
+
+            bg2.add(fontcolor1);
+            bg2.add(fontcolor2);
+            bg2.add(fontcolor3);
+
+            fontcolor.add(fontcolor1);
+            fontcolor.add(fontcolor2);
+            fontcolor.add(fontcolor3);
+        }
+
+        /**
+         * Добавить различные компоненты в соответствующие контейнеры.
+         */
+        public void add() {
+
+            jframe.setTitle ("Notepad"); // Название программы
+            jframe.setSize (600, 430); // Размер интерфейса программы
+            jframe.setResizable (true); // Изменить размер интерфейса программы
+            // jframe.getContentPane (). add (main); // Добавить основную панель main в полученный контейнер.
+            jframe.setLocationRelativeTo (null); // Запустить приложение в центре
+            jframe.setJMenuBar (menuBar); // Установить строку меню jframe
+
+            jsp = new JScrollPane (txt); // Создание полосы прокрутки (передача в нее текстового поля) и добавление текстового поля txt в main
+            jframe.getContentPane().add(jsp);
+
+            file.add (newFile); // Добавить содержимое, помещенное в блок файла.
+            file.add(openFile);
+            file.add(savaFile);
+            file.add(newSave);
+            file.addSeparator (); // Добавлена ​​горизонтальная разделительная линия
+            file.add(exit);
+
+            edit.add (copy); // Добавить содержимое, помещенное в блок редактирования
+            edit.addSeparator (); // добавили разделительную линию
+            edit.add(cut);
+            edit.addSeparator();
+            edit.add(Paste);
+            edit.addSeparator();
+            edit.add(del);
+
+            type.add (jradioButton); // Добавить содержимое в блок типа
+
+            more.add (about); // Добавить содержимое, помещенное в блок more
+            more.add(help);
+
+            menuBar.add (file); // Добавить блок операций на панели
+            menuBar.add(edit);
+            menuBar.add(type);
+            menuBar.add(more);
+
+            font.add(fontsize);
+            font.add(fontcolor);
+            type.add(font);
+
+            jframe.setVisible (true); // Установить форму видимой
+            jframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            jframe.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    super.windowClosing(e);
+                    exit();
+                }
+            });
+        }
+
+        /*
+         * Операция копирования
+         */
+        private static StringSelection stsel = null;
+
+        private Clipboard clipboard = jframe.getToolkit().getSystemClipboard();
+
+        public void copy() {
+            String tempText = txt.getSelectedText (); // Перетащите мышь, чтобы выделить текст
+            stsel = new StringSelection(tempText);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stsel, stsel);
+        }
+
+        /*
+         * Вырезать операцию
+         */
+        public void cut() {
+            String tempText = txt.getSelectedText();
+            StringSelection editText = new StringSelection(tempText);
+            clipboard.setContents(editText, null);
+            int start = txt.getSelectionStart();
+            int end = txt.getSelectionEnd();
+            txt.replaceRange("", start, end);
+        }
+
+        /*
+         * Операция вставки
+         */
+        public void Paste() {
+            Transferable contents = clipboard.getContents(this);
+            DataFlavor flavor = DataFlavor.stringFlavor;
+            if (contents.isDataFlavorSupported(flavor)) {
+                try {
+                    String str;
+                    str = (String) contents.getTransferData(flavor);
+                    txt.setText(txt.getText() + str);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+
+        /*
+         * операция дель
+         */
+        public void del() {
+            int start = txt.getSelectionStart();
+            int end = txt.getSelectionEnd();
+            txt.replaceRange("", start, end);
+        }
+
+        /*
+         * операция ввода / вывода
+         */
+
+        private static File OpenFile = null; // Открыть объект файла
+        private static File SavaFile = null; // Сохранить объект файла
+        private static BufferedReader br = null; // Буферизованный поток ----- читать
+        private static BufferedWriter bw = null; // Буферизованный поток ----- запись
+
+        /*
+         * Новая файловая операция
+         */
+        public void newFile() {
+            new Notepad().add();
+        }
+
+        /*
+         * Открыть файл операции
+         */
+        public void openFile() {
+            int result;
+            StringBuilder str = new StringBuilder();
+            String temp;
+            JFileChooser fileChooser = new JFileChooser(".");
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            result = fileChooser.showOpenDialog(null);
+
+            if (JFileChooser.APPROVE_OPTION == result) {
+                OpenFile = new File(fileChooser.getSelectedFile().getPath());
+                try {
+                    br = new BufferedReader(new FileReader(OpenFile));
+                    while ((temp = br.readLine()) != null) {
+                        str.append(temp).append("\r\n");
+                    }
+                    br.close();
+                    txt.setText(str.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        /*
+         * Операция сохранения файлов
+         */
+        public void sava() {
+            int result = 0;
+            String temp = txt.getText();
+            JFileChooser fileChooser = new JFileChooser();
+            result = fileChooser.showSaveDialog(null);
+            if (JFileChooser.APPROVE_OPTION == result) {
+                SavaFile = new File(fileChooser.getSelectedFile().getPath());
+                boolean isWrite = true;
+                if (SavaFile.exists()) {
+                    int verifyValue = JOptionPane.showConfirmDialog (null, SavaFile + "Файл уже существует, он перезаписан?", "Сохранить", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+                    if (confirmValue != JOptionPane.YES_OPTION) {
+                        isWrite = false;
+                    }
+                }
+                if (isWrite)
+                    try {
+                        bw = new BufferedWriter(new FileWriter(SavaFile));
+                        bw.write(temp);
+                        bw.flush();
+                        bw.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                if (isCloseIng) {
+                    this.jframe.dispose();
+                }
+            }
+
+        }
+
+        /*
+         * Выход из операции
+         */
+        public void exit() {
+            String temp = txt.getText();
+            if (temp != null && temp.length() > 0) {
+                int verifyValue = JOptionPane.showConfirmDialog (null, "Сохранить содержимое?", "Сохранить", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (confirmValue == JOptionPane.YES_OPTION) {
+                    isCloseIng = true;
+                    sava();
+                } else {
+                    this.jframe.dispose();
+                }
+            } else {
+                this.jframe.dispose();
+            }
+        }
+
+        /*
+         * Был ли он сохранен во время операции выхода
+         */
+        private static boolean isCloseIng = false;
+
+        /*
+         * О работе блока
+         */
+        public String about() {
+            return "Это программное обеспечение для блокнота, написанное на чистом Java";
+        }
+
+        /*
+         * Работа блока помощи
+         */
+        public String help() {
+            return «Если у вас возникли проблемы во время использования, пожалуйста, свяжитесь с автором!»;
+        }
+
+        /*
+         * Метод реализации контролируемых компонентов
+         *
+         *
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource () == newFile) {// Новый файл
+                newFile();
+            }
+            if (e.getSource () == openFile) {// Открыть файл
+                openFile();
+            }
+            if (e.getSource () == savaFile) {// Сохранить файл
+                sava();
+            }
+            if (e.getSource () == newSave) {// Сохранить как файл
+                sava();
+            }
+            if (e.getSource () == exit) {// Выйти из операции
+                exit();
+            }
+            if (e.getSource () == about) {// Об операции
+                JOptionPane.showMessageDialog(null, about());
+            }
+            if (e.getSource () == help) {// операция help
+                JOptionPane.showMessageDialog(null, help());
+            }
+            if (e.getSource () == jradioButton && jradioButton.isSelected ()) {// Операция перевода строки
+                txt.setLineWrap(true);
+            } else if (e.getSource() == jradioButton && !jradioButton.isSelected()) {
+                txt.setLineWrap(false);
+            }
+            /*
+             * Редактировать, всплывающее меню
+             */
+            if (e.getSource () == copy || e.getSource () == copy1) {// copy
+                copy();
+            }
+            if (e.getSource () == cut || e.getSource () == cut1) {// cut
+                cut();
+            }
+            if (e.getSource () == Вставить || e.getSource () == Вставить1) {// Вставить
+                Paste();
+            }
+            if (e.getSource () == del || e.getSource () == del1) {// удалить
+                del();
+            }
+
+            /*
+             * Размер шрифта
+             */
+            if (e.getSource() == fontsize1 && fontsize1.isSelected()) {
+                txt.setFont(new Font("Monospaced", Font.PLAIN, 13));
+            }
+            if (e.getSource() == fontsize2 && fontsize2.isSelected()) {
+                txt.setFont(new Font("Monospaced", Font.PLAIN, 22));
+            }
+            if (e.getSource() == fontsize3 && fontsize3.isSelected()) {
+                txt.setFont(new Font("Monospaced", Font.PLAIN, 30));
+            }
+            /*
+             * Цвет шрифта
+             */
+            if (e.getSource() == fontcolor1 && fontcolor1.isSelected()) {
+                txt.setForeground(Color.red);
+            }
+            if (e.getSource() == fontcolor2 && fontcolor2.isSelected()) {
+                txt.setForeground(Color.green);
+            }
+            if (e.getSource() == fontcolor3 && fontcolor3.isSelected()) {
+                txt.setForeground(Color.blue);
+            }
+        }
+
+        /*
+         * Программа входа
+         */
+        public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+            /*
+             * Установить стиль Windows
+             */
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            new Notepad().add();
+        }
+
+    }
